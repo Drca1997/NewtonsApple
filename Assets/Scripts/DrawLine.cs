@@ -32,7 +32,7 @@ public class DrawLine : MonoBehaviour
         {
             currentLine = Instantiate(linePrefab, mousePos, Quaternion.identity, null);
             lines.Add(currentLine);
-            GameAssets.Instance.AudioSource.PlayOneShot(GameAssets.Instance.WindClip, 0.5f);
+            AudioManager.Instance.Play("Wind");
         }
 
         else if (Input.GetMouseButton(0))

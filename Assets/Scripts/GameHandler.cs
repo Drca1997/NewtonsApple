@@ -4,76 +4,61 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.XR;
+using static Enums;
 
 public class GameHandler : MonoBehaviour
 {
     [SerializeField]
     private Camera mainCamera;
-    [SerializeField]
-    private TextMeshProUGUI resultLabel;
-    [SerializeField]
-    private TextMeshProUGUI scoreLabel;
-    [SerializeField]
-    private TextMeshProUGUI standardCurrentTryLabel;
-    [SerializeField]
-    private AudioSource source;
-    [SerializeField]
-    private AudioClip windClip;
-    [SerializeField]
-    private AudioClip fail;
-    [SerializeField]
-    private AudioClip win;
-    [SerializeField]
-    private GameObject gameEndPanel;
+
+    IGameMode gameMode;
 
     private Spawner spawner;
     private DrawLine drawLineManager;
     private GameObject apple;
     private GameObject newton;
 
-    private int standardModeCurrentTry;
-    private int standardModeCurrentScore;
-    public int STANDARD_MODE_NUM_TRIES = 10;
-    private int survivorModeCurrentScore;
-
+  
     public const float RESOLUTION = 0.1f;
 
-    public int StandardModeCurrentTry { get => standardModeCurrentTry; set => standardModeCurrentTry = value; }
-    public int SurvivorModeCurrentScore { get => survivorModeCurrentScore; set => survivorModeCurrentScore = value; }
+    private int score;
+    private int tries;
+
+    public int Tries { get => tries; }
+    public int Score { get => score; }
 
 
-    // Start is called before the first frame update
-    void Awake()
+    public static event EventHandler<EndOfGameArgs> EndOfGame;
+    public class EndOfGameArgs: EventArgs
     {
-        GameAssets.Instance.MainCamera = mainCamera;
-        GameAssets.Instance.ResultLabel = resultLabel;
-        GameAssets.Instance.AudioSource = source;
-        GameAssets.Instance.WindClip = windClip;
-        GameAssets.Instance.Fail = fail;
-        GameAssets.Instance.Win = win;
-        
+        public int finalScore;
     }
+
 
     private void Start()
     {
+        GameAssets.Instance.MainCamera = mainCamera;
+        score = 0;
+        tries = 0;
         spawner = GetComponent<Spawner>();
         drawLineManager = GetComponent<DrawLine>();
+       
         switch (GameAssets.Instance.Storage.gameModeToPlay)
         {
-            case SO_PersistentStorage.GameMode.STANDARD:
-                standardModeCurrentTry = 0;
-                standardModeCurrentScore = 0;
-                standardCurrentTryLabel.gameObject.SetActive(true);
-                NewStandardTry();
+            case GameModeCode.STANDARD:
+                gameMode = new StandardMode(this);
                 break;
-            case SO_PersistentStorage.GameMode.SURVIVOR:
-
+            case GameModeCode.SURVIVOR:
+                gameMode = new SurvivorMode(this);
                 break;
             default:
                 Debug.LogError("Something went wrong loading game mode");
                 SceneManager.LoadScene("MainMenu");
                 break;
         }
+        NewTry();
     }
 
     // Update is called once per frame
@@ -82,51 +67,45 @@ public class GameHandler : MonoBehaviour
       
     }
 
+    private void NewTry()
+    {
+        GameOver.OnTryEnd += OnTryEnd;
+        tries++;
+        UIManager.Instance.UpdateTries(tries);
+        AudioManager.Instance.Source.Stop();
+        GameObject[] elems = spawner.SpawnElems();
+        apple = elems[0];
+        newton = elems[1];
+    }
+
     public void OnBack()
     {
         SceneManager.LoadScene("MainMenu");
     }
 
-    public void NewStandardTry()
+    private void OnTryEnd(object sender, GameOver.OnTryEndArgs args)
     {
-        DestroyPreviousTryElems();
-        source.Stop();
-        standardModeCurrentTry++;
-        standardCurrentTryLabel.SetText("Current Try: " + standardModeCurrentTry);
-        if (standardModeCurrentTry > STANDARD_MODE_NUM_TRIES)
+        GameOver.OnTryEnd -= OnTryEnd;
+        if (args.resultCode == ResultCode.VICTORY)
         {
-            EndOfGame();
+            score++;
+            UIManager.Instance.UpdateScore(score);
+        }
+        if (!gameMode.OnTryEnd(args.resultCode))
+        {
+            EndOfGame?.Invoke(this, new EndOfGameArgs {finalScore = score });
             return;
         }
-        GameObject[] elems= spawner.SpawnElems();
-        apple = elems[0];
-        newton = elems[1];
-        GameOver.OnWin += OnWin;
-    }
-
-    private void OnWin(object sender, EventArgs args)
-    {
-        if (GameAssets.Instance.Storage.gameModeToPlay == SO_PersistentStorage.GameMode.STANDARD)
-        {
-            standardModeCurrentScore++;
-            scoreLabel.SetText("SCORE: " + standardModeCurrentScore);
-        }
+        DestroyPreviousTryElems();
+        NewTry();
     }
 
     private void DestroyPreviousTryElems()
     {
-        GameOver.OnWin -= OnWin;
         Destroy(apple);
-        Destroy(newton);
+        DestroyImmediate(newton);
         drawLineManager.DestroyLines();
     }
 
-    private void EndOfGame()
-    {
-        gameEndPanel.SetActive(true);
-        gameEndPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText(standardModeCurrentScore.ToString());
-        resultLabel.gameObject.SetActive(false);
-        scoreLabel.gameObject.SetActive(false);
-        standardCurrentTryLabel.gameObject.SetActive(false);
-    }
+   
 }

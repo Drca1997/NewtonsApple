@@ -694,6 +694,7 @@ GameObject:
   - component: {fileID: 694771798}
   - component: {fileID: 694771796}
   - component: {fileID: 694771797}
+  - component: {fileID: 694771799}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: GameController
@@ -755,15 +756,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 519420031}
-  resultLabel: {fileID: 1162168503}
-  scoreLabel: {fileID: 1530255891}
-  standardCurrentTryLabel: {fileID: 415454481}
+--- !u!114 &694771799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 694771794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5747883c4f0d0fa4c9efc573d0f44733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   source: {fileID: 519420030}
-  windClip: {fileID: 8300000, guid: 3cdb1f58117d4434dbf4b30dcc1789a9, type: 3}
-  fail: {fileID: 8300000, guid: 4941f47e2b67d4c4cb0971f81bcc3908, type: 3}
-  win: {fileID: 8300000, guid: 89a1acfd4488e3c408ecf23a0a7ee094, type: 3}
-  gameEndPanel: {fileID: 1126441131}
-  STANDARD_MODE_NUM_TRIES: 10
+  sounds:
+  - name: Wind
+    clip: {fileID: 8300000, guid: 3cdb1f58117d4434dbf4b30dcc1789a9, type: 3}
+    volume: 0.5
+  - name: Victory
+    clip: {fileID: 8300000, guid: 89a1acfd4488e3c408ecf23a0a7ee094, type: 3}
+    volume: 0.5
+  - name: Defeat
+    clip: {fileID: 8300000, guid: 4941f47e2b67d4c4cb0971f81bcc3908, type: 3}
+    volume: 0.5
+  - name: Soundtrack
+    clip: {fileID: 8300000, guid: 42d94ea78c854e848b2e394985c6b3bd, type: 3}
+    volume: 0.5
 --- !u!1 &735932743
 GameObject:
   m_ObjectHideFlags: 0
@@ -2047,6 +2065,7 @@ GameObject:
   - component: {fileID: 2005023139}
   - component: {fileID: 2005023138}
   - component: {fileID: 2005023137}
+  - component: {fileID: 2005023141}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2139,6 +2158,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &2005023141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005023136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee212a6953e1d5a4aa01cfda2687a39f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resultLabel: {fileID: 1162168503}
+  scoreLabel: {fileID: 1530255891}
+  standardCurrentTryLabel: {fileID: 415454481}
+  finalScoreLabel: {fileID: 831227044}
+  gameEndPanel: {fileID: 1126441131}
 --- !u!1 &2045235346
 GameObject:
   m_ObjectHideFlags: 0

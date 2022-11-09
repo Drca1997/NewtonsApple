@@ -23,13 +23,6 @@ public class GameAssets : MonoBehaviour
 
     private Camera mainCamera;
 
-    public TextMeshProUGUI ResultLabel;
-
-    public AudioSource AudioSource;
-    public AudioClip WindClip;
-    public AudioClip Fail;
-    public AudioClip Win;
-
     public SO_PersistentStorage Storage;
 
 }

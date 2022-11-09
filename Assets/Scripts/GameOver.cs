@@ -4,19 +4,24 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR;
+using static Enums;
 
 public class GameOver : MonoBehaviour
 {
-   private TextMeshProUGUI label;
-
     private bool lost;
     private bool won;
 
-    public static event EventHandler OnWin;
+    public static event EventHandler<OnTryEndArgs> OnTryEnd;
+
+    public class OnTryEndArgs: EventArgs
+    {
+        public ResultCode resultCode;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        label = GameAssets.Instance.ResultLabel;
         lost = false;
         won = false;
     }
@@ -36,10 +41,10 @@ public class GameOver : MonoBehaviour
             Debug.Log("BONK!");
             if (!won && !lost)
             {
-                OnWin?.Invoke(this, new EventArgs());
+                
                 won = true;
-                GameAssets.Instance.AudioSource.PlayOneShot(GameAssets.Instance.Win, 0.7f);
-                StartCoroutine(DelayEndOfGame("VICTORY", new Color32(38, 174, 219, 255)));
+                AudioManager.Instance.Play("Victory");
+                StartCoroutine(DelayEndOfGame(ResultCode.VICTORY, new Color32(38, 174, 219, 255)));
 
             }
         }
@@ -47,21 +52,20 @@ public class GameOver : MonoBehaviour
         {
             if (!lost && !won)
             {
-                GameAssets.Instance.AudioSource.PlayOneShot(GameAssets.Instance.Fail, 0.5f);
+                AudioManager.Instance.Play("Defeat");
                 lost = true;
-                StartCoroutine(DelayEndOfGame("DEFEAT", new Color32(166, 35, 28, 255)));
+                StartCoroutine(DelayEndOfGame(ResultCode.DEFEAT, new Color32(166, 35, 28, 255)));
             }
         }
     }
 
-    private IEnumerator DelayEndOfGame(string result, Color32 color)
+    private IEnumerator DelayEndOfGame(ResultCode resultCode, Color32 color)
     {
-        label.gameObject.SetActive(true);
-        label.text = result;
-        label.color = color;
+        UIManager.Instance.ShowResultLabel(resultCode, color);
         yield return new WaitForSeconds(2.5f);
-        label.gameObject.SetActive(false);
-        GameObject.FindGameObjectWithTag("GameController").GetComponent<GameHandler>().NewStandardTry();
+        UIManager.Instance.HideResultLabel();
+        OnTryEnd?.Invoke(this, new OnTryEndArgs { resultCode = resultCode });
+        Destroy(this);
     }
 
 }
