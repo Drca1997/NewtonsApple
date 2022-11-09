@@ -37,9 +37,13 @@ public class GameHandler : MonoBehaviour
     }
 
 
-    private void Start()
+    private void Awake()
     {
         GameAssets.Instance.MainCamera = mainCamera;
+
+    }
+    private void Start()
+    {
         score = 0;
         tries = 0;
         spawner = GetComponent<Spawner>();
@@ -58,6 +62,9 @@ public class GameHandler : MonoBehaviour
                 SceneManager.LoadScene("MainMenu");
                 break;
         }
+        GameObject[] elems = spawner.SpawnElems();
+        apple = elems[0];
+        newton = elems[1];
         NewTry();
     }
 
@@ -73,9 +80,8 @@ public class GameHandler : MonoBehaviour
         tries++;
         UIManager.Instance.UpdateTries(tries);
         AudioManager.Instance.Source.Stop();
-        GameObject[] elems = spawner.SpawnElems();
-        apple = elems[0];
-        newton = elems[1];
+        apple.transform.position = spawner.GetRandomXSpawnPosition(Screen.height - 20);
+        newton.transform.position = spawner.GetRandomXSpawnPosition(Screen.height / 6);
     }
 
     public void OnBack()
@@ -93,17 +99,31 @@ public class GameHandler : MonoBehaviour
         }
         if (!gameMode.OnTryEnd(args.resultCode))
         {
+            CheckHighscoreSurvivorMode();
             EndOfGame?.Invoke(this, new EndOfGameArgs {finalScore = score });
             return;
         }
-        DestroyPreviousTryElems();
+        ResetTry();
         NewTry();
     }
 
-    private void DestroyPreviousTryElems()
+    private void CheckHighscoreSurvivorMode()
     {
-        Destroy(apple);
-        DestroyImmediate(newton);
+        if (Utils.IsSurvivorMode())
+        {
+            int highscore = PlayerPrefs.GetInt("highscore", -1);
+            if (highscore < score)
+            {
+                UIManager.Instance.ShowNewHighscoreLabel();
+                PlayerPrefs.SetInt("highscore", score);
+            }
+        }
+    }
+
+    private void ResetTry()
+    {
+        apple.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        apple.GetComponent<Rigidbody2D>().angularVelocity = 0f;
         drawLineManager.DestroyLines();
     }
 

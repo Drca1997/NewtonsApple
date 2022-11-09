@@ -9,13 +9,18 @@ public class Spawner : MonoBehaviour
     private GameObject applePrefab;
     [SerializeField]
     private GameObject newtonPrefab;
+    [SerializeField]
+    private GameObject wallPrefab;
 
 
     // Start is called before the first frame update
     void Start()
     {
-       
-       
+        Vector2 leftWallPos = GameAssets.Instance.MainCamera.ScreenToWorldPoint(new Vector2(0, Screen.height / 2));
+        Vector2 rightWallPos = GameAssets.Instance.MainCamera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height / 2));
+        Instantiate(wallPrefab, leftWallPos, Quaternion.Euler(0, 0, 90), null);
+        Instantiate(wallPrefab, rightWallPos, Quaternion.Euler(0, 0, 90), null);
+
     }
 
     // Update is called once per frame
@@ -27,6 +32,7 @@ public class Spawner : MonoBehaviour
 
     public GameObject [] SpawnElems()
     {
+       
         GameObject[] elems = new GameObject[2]; 
         Vector2 appleSpawnPos = GetRandomXSpawnPosition(Screen.height - 20);
         Vector2 newtonSpawnPos = GetRandomXSpawnPosition(Screen.height / 6);
@@ -35,7 +41,7 @@ public class Spawner : MonoBehaviour
         return elems;
     }
 
-    private Vector2 GetRandomXSpawnPosition(float y)
+    public Vector2 GetRandomXSpawnPosition(float y)
     {
         float screenX = Random.Range(90, Screen.width - 60);
         

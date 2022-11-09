@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using static Enums;
@@ -17,6 +18,8 @@ public class UIManager : MonoBehaviour
     private TextMeshProUGUI standardCurrentTryLabel;
     [SerializeField]
     private TextMeshProUGUI finalScoreLabel;
+    [SerializeField]
+    private TextMeshProUGUI newHighscoreLabel;
     [SerializeField]
     private GameObject gameEndPanel;
 
@@ -62,6 +65,12 @@ public class UIManager : MonoBehaviour
     public void HideResultLabel()
     {
         resultLabel.gameObject.SetActive(false);
+    }
+
+    public void ShowNewHighscoreLabel()
+    {
+        newHighscoreLabel.gameObject.SetActive(true);
+        newHighscoreLabel.SetText("New Highscore!");
     }
     private void OnEndOfGame(object sender, GameHandler.EndOfGameArgs args)
     {

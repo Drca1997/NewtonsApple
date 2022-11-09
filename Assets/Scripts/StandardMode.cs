@@ -6,7 +6,7 @@ using static Enums;
 
 public class StandardMode : IGameMode
 {
-    public const int STANDARD_MODE_MAXIMUM_TRIES = 5;
+    public const int STANDARD_MODE_MAXIMUM_TRIES = 10;
     private GameHandler gameHandler;
 
     public StandardMode(GameHandler handler)

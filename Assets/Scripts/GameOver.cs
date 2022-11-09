@@ -63,9 +63,10 @@ public class GameOver : MonoBehaviour
     {
         UIManager.Instance.ShowResultLabel(resultCode, color);
         yield return new WaitForSeconds(2.5f);
+        lost = false;
+        won = false;
         UIManager.Instance.HideResultLabel();
         OnTryEnd?.Invoke(this, new OnTryEndArgs { resultCode = resultCode });
-        Destroy(this);
     }
 
 }
